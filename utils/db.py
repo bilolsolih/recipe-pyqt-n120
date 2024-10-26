@@ -32,3 +32,13 @@ def execute_read_query(connection, query):
     except Exception as e:
         print(f"The error '{e}' occurred")
         raise pymysql.Error(e)
+
+
+def set_up_database():
+    connection = create_connection()
+    execute_query(connection, """
+    CREATE TABLE IF NOT EXISTS category(
+        category_id INT PRIMARY KEY AUTO_INCREMENT,
+	    category_name VARCHAR(64) NOT NULL UNIQUE,
+	    photo VARCHAR(128) NOT NULL);
+    """)
