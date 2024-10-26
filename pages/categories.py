@@ -1,34 +1,61 @@
+import pymysql
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QGridLayout, QLayout, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QGridLayout, QVBoxLayout, QScrollArea
+from pymysql import cursors
 
 from widgets.category import CategoryItem
 
 
-class CategoriesPage(QWidget):
-    def __init__(self):
+class CategoriesPage(QScrollArea):
+    def __init__(self, columns: int = 2):
         super().__init__()
-        self.layout = self.__set_up_layout()
-        self.setLayout(self.layout)
+        self.columns = columns
+        self.widget = QWidget()
 
-    def __set_up_layout(self) -> QLayout:
-        item0 = CategoryItem("Seafood", "assets/seafood.png", 356, 149, reverse_title_and_photo=True)
-        item1 = CategoryItem("Lunch", "assets/lunch.png", 160, 145)
-        item2 = CategoryItem("Breakfast", "assets/breakfast.png", 160, 145)
-        item3 = CategoryItem("Dinner", "assets/dinner.png", 160, 145)
-        item4 = CategoryItem("Vegan", "assets/vegan.png", 160, 145)
-        item5 = CategoryItem("Dessert", "assets/dessert.png", 160, 145)
-        item6 = CategoryItem("Drinks", "assets/drinks.png", 160, 145)
-        main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.__set_up_layout()
+        self.setWidget(self.widget)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setStyleSheet("border: null;")
+
+
+
+    def get_items(self) -> list[QWidget]:
+        return [
+            CategoryItem("Lunch", "assets/lunch.png", 160, 145),
+            CategoryItem("Breakfast", "assets/breakfast.png", 160, 145),
+            CategoryItem("Dinner", "assets/dinner.png", 160, 145),
+            CategoryItem("Vegan", "assets/vegan.png", 160, 145),
+            CategoryItem("Dessert", "assets/dessert.png", 160, 145),
+            CategoryItem("Drinks", "assets/drinks.png", 160, 145),
+            CategoryItem("Lunch 2", "assets/lunch.png", 160, 145),
+            CategoryItem("Breakfast 2", "assets/breakfast.png", 160, 145),
+            CategoryItem("Dinner 2", "assets/dinner.png", 160, 145),
+            CategoryItem("Vegan 2", "assets/vegan.png", 160, 145),
+            CategoryItem("Dessert 2", "assets/dessert.png", 160, 145),
+            CategoryItem("Drinks 2", "assets/drinks.png", 160, 145)
+        ]
+
+    def get_item_main(self) -> QWidget:
+        return CategoryItem("Seafood", "assets/seafood.png", 356, 149, reverse_title_and_photo=True)
+
+    def __set_up_layout(self) -> None:
         layout = QGridLayout()
         layout.setHorizontalSpacing(20)
+        layout.setVerticalSpacing(0)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(item1, 0, 0)
-        layout.addWidget(item2, 0, 1)
-        layout.addWidget(item3, 1, 0)
-        layout.addWidget(item4, 1, 1)
-        layout.addWidget(item5, 2, 0)
-        layout.addWidget(item6, 2, 1)
-        main_layout.addWidget(item0)
+
+        column_index = 0
+        row_index = 0
+        for item in self.get_items():
+            layout.addWidget(item, row_index, column_index)
+            column_index += 1
+            if column_index >= self.columns:
+                row_index += 1
+                column_index = 0
+
+        main_layout = QVBoxLayout()
+        main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        main_layout.addWidget(self.get_item_main())
         main_layout.addLayout(layout)
-        return main_layout
+
+        self.widget.setLayout(main_layout)
